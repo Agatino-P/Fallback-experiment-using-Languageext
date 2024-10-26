@@ -49,6 +49,27 @@ public class ReactOnRepositoryTests
         await f.Should().ThrowAsync<Exception>();
     }
 
+
+    [Fact]
+    public async Task ShouldThrow2()
+    {
+        Repo _sut = new();
+
+
+        Task<Either<ProblemDetails, Unit>> t2 = _sut.Except().ToAsync()
+            .Match(o => o, ex => throw ex)
+            .Match(
+                entity => GoAhead(entity),
+                ()=>new ProblemDetails { Title = "Entity not found" }
+                )
+            //.ToAsync()
+            ;
+    }
+
+   
+
+
+
     private Either<ProblemDetails, Unit> GoAhead(Entity entity) => Unit.Default;
 
 }
