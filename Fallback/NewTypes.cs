@@ -1,7 +1,9 @@
 ﻿using LanguageExt;
 using LanguageExt.Common;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection.Metadata.Ecma335;
 using System.Text;
@@ -33,10 +35,13 @@ internal class NewTypes
 
     private Either<Error, Unit> ReturnDifferentErrors(bool flag)
     {
-        ErrorException a = CustomError.New("Custom").ToErrorException();
-        var b = new CustomError("Custom").ToErrorException();
+        CustomExpected c1 = new CustomExpected("Custom");
 
-        return flag ? CustomError.New("Custom") : AnotherError.New("Another");
+        Error c2 = CustomExpected.New(new Exception("An exception");
+
+        CustomExceptional c3 = CustomExceptional.From(new Exception("an exception"));
+
+        return flag ? c1 : c3;
     }
 }
 
@@ -44,6 +49,27 @@ public record Age(int Value)
 ;
 
 
-public record CustomError(string Message): Expected(Message, 0, Prelude.None);
+public record CustomExpected(string Message) : Expected(Message, 0, Prelude.None);
 
 public record AnotherError(string Message) : Expected(Message, 0, Prelude.None);
+
+public record CustomExceptional : Error
+{
+    public new Exception Exception { get; init; }
+
+    public CustomExceptional(Exception exception) => Exception = exception;
+
+    public static CustomExceptional From(Exception exception) => new(exception);
+
+    public override string Message => Exception.Message;
+    public override bool IsExceptional => true;
+    public override bool IsExpected => false;
+
+    public override bool Is<E>() => Exception is E;
+
+    public override ErrorException ToErrorException() => Error.New(Exception).ToErrorException();
+
+}
+
+
+
