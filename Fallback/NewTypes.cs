@@ -1,6 +1,9 @@
-﻿using System;
+﻿using LanguageExt;
+using LanguageExt.Common;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -20,7 +23,27 @@ internal class NewTypes
     {
         return age.Value;
     }
+
+    private CustomError ReturnCustomError(string message)
+    {
+        var ce = CustomError.New("a message");
+        return new CustomError(message);
+    }
+
+
+    private Either<Error, Unit> ReturnDifferentErrors(bool flag)
+    {
+        ErrorException a = CustomError.New("Custom").ToErrorException();
+        var b = new CustomError("Custom").ToErrorException();
+
+        return flag ? CustomError.New("Custom") : AnotherError.New("Another");
+    }
 }
 
 public record Age(int Value)
 ;
+
+
+public record CustomError(string Message): Expected(Message, 0, Prelude.None);
+
+public record AnotherError(string Message) : Expected(Message, 0, Prelude.None);
